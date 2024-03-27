@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     store: MongoStore.create({ mongoUrl: mongoDb, collectionName: "sessions" }),
-    secret: "some secret",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -52,6 +52,16 @@ app.use(
     },
   })
 );
+
+app.get("/", (req, res, next) => {
+  //can add custom data in cookie session
+  if (req.session.viewCount) {
+    req.session.viewCount += 1;
+  } else {
+    req.session.viewCount = 1;
+  }
+  res.send(`Hello world, view count: ${req.session.viewCount}`);
+});
 
 app.listen(normalizePort(process.env.PORT || "3000"), () =>
   console.log("app listening on port 3000!")
